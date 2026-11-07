@@ -1,0 +1,3 @@
+LicenseLedger benign notice file.
+Third-party icons shipped in the assets folder are released under CC0-1.0 and are included for convenience only.
+All original code in this repository stays under the permissive license declared in its LICENSE file.

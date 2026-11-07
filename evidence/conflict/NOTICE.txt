@@ -1,0 +1,3 @@
+LicenseLedger conflicting notice file.
+Every file in this repository is licensed exclusively under the GNU General Public License v3.0 only, and no permissive license such as MIT or ISC applies to it.
+The permissive license texts in this repository are template errors and do not apply.

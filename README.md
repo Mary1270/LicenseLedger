@@ -42,7 +42,7 @@ ok = registry.view().is_certified("Mary1270", "LicenseLedger", "FULL_40_CHAR_SHA
 
 ## Deployment
 
-Deployed on GenLayer Studio at `ADDRESS`. The contract is submitted on its own; there is no frontend in this repository. The files under `evidence/` are sample inputs for live testing: pin them by the full SHA of the commit that contains them, for example `https://raw.githubusercontent.com/Mary1270/LicenseLedger/FULL_40_CHAR_SHA/LICENSE`.
+Deployed on GenLayer Studio at `0xBA24100528d2425a97f92929AD0131774B947Cf0` ([explorer](https://explorer-studio.genlayer.com/address/0xBA24100528d2425a97f92929AD0131774B947Cf0)). The contract is submitted on its own; there is no frontend in this repository. The files under `evidence/` are sample inputs for live testing: pin them by the full SHA of the commit that contains them, for example `https://raw.githubusercontent.com/Mary1270/LicenseLedger/FULL_40_CHAR_SHA/LICENSE`.
 
 ## Tests
 

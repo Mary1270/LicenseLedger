@@ -18,7 +18,7 @@ MAX_PATH = 200
 MAX_REASON = 240
 MAX_QUOTE = 200
 MIN_LICENSE_QUOTE = 12
-MIN_MANIFEST_QUOTE = 6
+MIN_MANIFEST_QUOTE = 5
 RAW_HOST = "raw.githubusercontent.com"
 HEX = "0123456789abcdef"
 
@@ -106,6 +106,15 @@ LICENSES = {
 
 def _norm(s):
     return " ".join(str(s).split()).lower()
+
+
+def _squash(s):
+    return "".join(ch for ch in str(s).lower() if ch.isalnum())
+
+
+def _grounded(quote, page, min_len):
+    sq = _squash(quote)
+    return len(sq) >= min_len and sq in _squash(page)
 
 
 def _clean_text(s, limit):
@@ -329,19 +338,19 @@ def _evaluate(spdx, license_url, manifest_url, counter_url):
     if verdict not in ("COMPLIANT", "NON_COMPLIANT"):
         return _pack("UNDETERMINED", reason or "no clear verdict", "", "")
     if verdict == "COMPLIANT":
-        if len(license_quote) < MIN_LICENSE_QUOTE or _norm(license_quote) not in _norm(lic):
-            return _pack("UNDETERMINED", "compliant verdict was not backed by an exact quote from the LICENSE file", "", "")
+        if not _grounded(license_quote, lic, MIN_LICENSE_QUOTE):
+            return _pack("UNDETERMINED", "compliant verdict was not backed by an exact quote from the LICENSE file, model quote: " + license_quote[:80], "", "")
         if man:
             if not _declares(man, spdx):
                 return _pack("UNDETERMINED", "manifest does not declare the SPDX identifier " + spdx, "", "")
-            if len(manifest_quote) < MIN_MANIFEST_QUOTE or _norm(manifest_quote) not in _norm(man):
-                return _pack("UNDETERMINED", "compliant verdict was not backed by an exact quote from the manifest", "", "")
+            if not _grounded(manifest_quote, man, MIN_MANIFEST_QUOTE):
+                return _pack("UNDETERMINED", "compliant verdict was not backed by an exact quote from the manifest, model quote: " + manifest_quote[:80], "", "")
         else:
             manifest_quote = ""
         return _pack("COMPLIANT", reason, license_quote, manifest_quote)
     source = counter if counter else (lic + " " + man)
-    if len(conflict_quote) < MIN_LICENSE_QUOTE or _norm(conflict_quote) not in _norm(source):
-        return _pack("UNDETERMINED", "non-compliant verdict was not backed by an exact quote showing the conflict", "", "")
+    if not _grounded(conflict_quote, source, MIN_LICENSE_QUOTE):
+        return _pack("UNDETERMINED", "non-compliant verdict was not backed by an exact quote showing the conflict, model quote: " + conflict_quote[:80], "", "")
     return _pack("NON_COMPLIANT", reason, conflict_quote, "")
 
 

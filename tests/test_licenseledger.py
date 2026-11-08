@@ -464,6 +464,27 @@ class TestVerify(Base):
         res = json.loads(self.call(ANYONE, "verify", aid))
         self.assertEqual(res["verdict"], "UNDETERMINED")
 
+    def test_quote_survives_punctuation_and_line_wraps(self):
+        wrapped = "Permission is hereby granted free of charge to any person obtaining a copy of this software"
+        self.model.fixed = {"verdict": "COMPLIANT", "license_quote": wrapped, "manifest_quote": "license MIT"}
+        aid = self.attest()
+        res = json.loads(self.call(ANYONE, "verify", aid))
+        self.assertEqual(res["verdict"], "COMPLIANT")
+
+    def test_changed_word_in_quote_is_ungrounded(self):
+        bad = "Permission is hereby denied free of charge to any person obtaining a copy of this software"
+        self.model.fixed = {"verdict": "COMPLIANT", "license_quote": bad, "manifest_quote": "license MIT"}
+        aid = self.attest()
+        res = json.loads(self.call(ANYONE, "verify", aid))
+        self.assertEqual(res["verdict"], "UNDETERMINED")
+
+    def test_ungrounded_reason_shows_the_model_quote_for_debugging(self):
+        self.model.fixed = {"verdict": "COMPLIANT", "license_quote": "an invented sentence that is not in the file", "manifest_quote": '"license": "MIT"'}
+        aid = self.attest()
+        self.call(ANYONE, "verify", aid)
+        self.assertIn("an invented sentence", self.get(aid)["reason"])
+        self.assertNotIn("|", self.get(aid)["reason"])
+
     def test_manifest_without_declared_id_blocks_compliance(self):
         self.set_pages(man=MANIFEST_SILENT)
         self.model.fixed = {"verdict": "COMPLIANT", "license_quote": longest_line(MIT_TEXT), "manifest_quote": '"private": true'}
